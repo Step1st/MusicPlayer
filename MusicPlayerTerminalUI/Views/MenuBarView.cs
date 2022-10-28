@@ -8,22 +8,29 @@ using Terminal.Gui;
 
 namespace MusicPlayer.Views;
 
-internal static class MenuBarView
+internal class MenuBarView
 {
-    public static MenuBar MenuBar => new(new MenuBarItem[]
+    public MenuBar MenuBar { get; private set; }
+
+    private MenuBarView()
     {
-        new MenuBarItem("_File", new MenuItem[]
+        MenuBar = new(new MenuBarItem[]
         {
-            new MenuItem("_Open", "Open a music file", () => Console.Write("")),
+            new MenuBarItem("_File", new MenuItem[]
+            {
+                new MenuItem("_Open", "Open a music file", () => Console.Write("")),
 
-            new MenuItem("Open Pla_ylist", "Load a playlist", () => Console.Write("")),
+                new MenuItem("Open Pla_ylist", "Load a playlist", () => Console.Write("")),
 
-            new MenuItem("_Quit", "Exit Music Player", () => Application.RequestStop()),
-        }),
+                new MenuItem("_Quit", "Exit Music Player", () => Application.RequestStop()),
+            }),
 
-        new MenuBarItem("_Help", new MenuItem[]
-        {
-            new MenuItem("_About", "", () => Console.Write("")),
-        })
-    });
+            new MenuBarItem("_Help", new MenuItem[]
+            {
+                new MenuItem("_About", "", () => Console.Write("")),
+            })
+        });
+    }
+
+    public static MenuBarView GetMenuBarViewInstance { get; } = new();
 }
