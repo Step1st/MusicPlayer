@@ -10,7 +10,6 @@ namespace MusicPlayer.Views;
 
 internal class MusicPlayerView
 {
-    
     private IPlayer player;
 
     private Window Main;
@@ -18,11 +17,12 @@ internal class MusicPlayerView
     private FrameView playback;
     private FrameView playing;
 
+    private List<string> tracks = new List<string>();
+
     public MusicPlayerView(IPlayer player) => this.player = player;
 
-    public void Init()
+    private void SetupMain()
     {
-        Application.Init();
 
         Main = new Window("Music Player")
         {
@@ -41,16 +41,19 @@ internal class MusicPlayerView
             Height = Dim.Percent(70f)
         };
 
-        var list = new ListView(new List<string>() { "Track 1", "Track 2", "Track 3" })
+        var list = new ListView(tracks)
         {
             X = 0,
             Y = 0,
             Width = Dim.Fill(),
             Height = Dim.Fill()
         };
-        
-        trackList.Add(list);
 
+        trackList.Add(list);
+    }
+
+    private void SetupPlayback()
+    {
         playback = new FrameView("Playback")
         {
             X = Pos.Percent(85f),
@@ -62,32 +65,32 @@ internal class MusicPlayerView
         playback.Add(new Button("<< Seek")
         {
             X = Pos.Center(),
-            Y = Pos.Center()-3 - 3,
+            Y = Pos.Center() - 1 - 3,
             Width = 10,
             Height = 1
         });
 
         // add playback controls
-        playback.Add(new Button("Play")
+        playback.Add(new Button("Play/Pause")
         {
             X = Pos.Center(),
-            Y = Pos.Center() -3 - 1,
+            Y = Pos.Center() - 1 - 1,
             Width = 10,
             Height = 1
         });
 
-        playback.Add(new Button("Pause")
-        {
-            X = Pos.Center(),
-            Y = Pos.Center() -3 + 1,
-            Width = 10,
-            Height = 1
-        });
+        //playback.Add(new Button("Pause")
+        //{
+        //    X = Pos.Center(),
+        //    Y = Pos.Center() - 3 + 1,
+        //    Width = 10,
+        //    Height = 1
+        //});
 
         playback.Add(new Button(">> Seek")
         {
             X = Pos.Center(),
-            Y = Pos.Center() -3 + 3,
+            Y = Pos.Center() - 2 + 2,
             Width = 10,
             Height = 1
         });
@@ -96,7 +99,7 @@ internal class MusicPlayerView
         playback.Add(new Button("+ Volume")
         {
             X = Pos.Center(),
-            Y = Pos.Center() +4 -1,
+            Y = Pos.Center() + 3 - 1,
             Width = 10,
             Height = 1
         });
@@ -104,12 +107,14 @@ internal class MusicPlayerView
         playback.Add(new Button("- Volume")
         {
             X = Pos.Center(),
-            Y = Pos.Center() +4 + 1,
+            Y = Pos.Center() + 3 + 1,
             Width = 10,
             Height = 1
         });
+    }
 
-
+    private void SetupPlaying()
+    {
         playing = new FrameView("Playing")
         {
             X = 0,
@@ -148,11 +153,21 @@ internal class MusicPlayerView
         };
 
         playing.Add(timelabel);
+    }
+
+    public void Init()
+    {
+        Application.Init();
+
+        SetupMain();
+
+        SetupPlayback();
+
+        SetupPlaying();
 
         Main.Add(trackList);
         Main.Add(playback);
         Main.Add(playing);
-
 
         var top = Application.Top;
 
@@ -180,9 +195,36 @@ internal class MusicPlayerView
 
     public void OpenFile()
     {
-    }
+        var fileFormats = new string[] {".mp3", ".wav", ".flac" };
+        var dialog = new OpenDialog("Open File", "Open")
+        {
+            AllowsMultipleSelection = false,
+            CanChooseDirectories = false,
+            CanChooseFiles = true,
+            DirectoryPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+            AllowedFileTypes = fileFormats
+        };
+        Application.Run(dialog);
 
+        if (!dialog.Canceled)
+        {
+            // TODO: Add file to playlist
+        }
+    }
+    
     public void OpenFolder()
     {
+        var dialog = new OpenDialog("Open Folder", "Open")
+        {
+            AllowsMultipleSelection = false,
+            CanChooseDirectories = true,
+            CanChooseFiles = false,
+            DirectoryPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)
+        };
+        Application.Run(dialog);
+
+        if (!dialog.Canceled)
+        {
+            // TODO: Load playlist
+        }
     }
-}
