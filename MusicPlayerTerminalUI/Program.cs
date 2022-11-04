@@ -1,4 +1,3 @@
-﻿using Terminal.Gui;
 using MusicPlayer.Views;
 using MusicPlayerCore;
 using System.Runtime.InteropServices;
