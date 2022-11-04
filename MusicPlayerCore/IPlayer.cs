@@ -2,6 +2,8 @@
 
 public interface IPlayer
 {
+
+    PlaybackState PlaybackState { get; }
     void Start(string path);
     void PlayPause();
     void SeekForward();
@@ -10,7 +12,9 @@ public interface IPlayer
     System.TimeSpan CurrentTime();
     System.TimeSpan TotalTime();
     void ChangeVolume(double volume);
-    
+    void VolumeUp();
+    void VolumeDown();
+
 }
 
 public enum PlaybackState
