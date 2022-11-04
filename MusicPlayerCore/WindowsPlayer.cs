@@ -17,41 +17,36 @@ public class WindowsPlayer : IPlayer
 
     public WindowsPlayer()
     {
+        outputDevice = new WaveOutEvent();
+        outputDevice.PlaybackStopped += OnPlaybackStopped;
     }
 
+    public void Restart()
+    {
+        outputDevice.Stop();
+        Console.WriteLine("Restarting");
+    }
 
     public void Start(string path)
     {
         if (outputDevice != null)
         {
-            if (audioFile is not null)
-            {
-                audioFile.Dispose();
-                audioFile = null;
-            }
             outputDevice.Dispose();
-            playbackState = PlaybackState.Stopped;
         }
-
-        outputDevice = new WaveOutEvent();
-        outputDevice.PlaybackStopped += OnPlaybackStopped;
 
         // if the file exits
         if (File.Exists(path))
         {
-            // if the file is not already playing
-            if (audioFile == null)
-            {
-                // create a new audio file reader
-                audioFile = new AudioFileReader(path);
-                // set the output device to the audio file
-                outputDevice.Init(audioFile);
-                // play the audio file
-                outputDevice.Play();
-                // set the playback state to playing
-                playbackState = PlaybackState.Playing;
-            }
+            // create a new audio file reader
+            audioFile = new AudioFileReader(path);
+            // set the output device to the audio file
+            outputDevice.Init(audioFile);
+            // play the audio file
+            outputDevice.Play();
+            // set the playback state to playing
+            playbackState = PlaybackState.Playing;
         }
+        
     }
 
     public string Status()
@@ -97,7 +92,7 @@ public class WindowsPlayer : IPlayer
     }
     public void SeekBackward() 
     {
-        if  (playbackState != PlaybackState.Stopped && audioFile is not null)
+        if  (playbackState != PlaybackState.Stopped && audioFile != null)
         {
             if (audioFile.CurrentTime <= TimeSpan.FromSeconds(5))
             {
@@ -134,19 +129,12 @@ public class WindowsPlayer : IPlayer
     }
 
 
-    public void OnPlaybackStopped(object? sender, StoppedEventArgs? args)
+    public void OnPlaybackStopped(object? sender, StoppedEventArgs args)
     {
         if (audioFile is not null)
         {
             audioFile.Dispose();
-            audioFile = null;
-            Console.WriteLine("Audio file disposed");
         }
-        else
-        {
-            Console.WriteLine("Audio file is null");
-        }
-        Console.WriteLine("device disposed");
         outputDevice.Dispose();
         playbackState = PlaybackState.Stopped;
     }
