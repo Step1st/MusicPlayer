@@ -187,7 +187,7 @@ internal class MusicPlayerView
                 new MenuItem("_About", "", () => Console.Write("")),
             })
         });
-        
+
         top.Add(Main, menu);
 
         Application.Run();
@@ -195,7 +195,7 @@ internal class MusicPlayerView
 
     public void OpenFile()
     {
-        var fileFormats = new string[] {".mp3", ".wav", ".flac" };
+        var fileFormats = new string[] { ".mp3", ".wav", ".flac" };
         var dialog = new OpenDialog("Open File", "Open")
         {
             AllowsMultipleSelection = false,
@@ -211,7 +211,7 @@ internal class MusicPlayerView
             // TODO: Add file to playlist
         }
     }
-    
+
     public void OpenFolder()
     {
         var dialog = new OpenDialog("Open Folder", "Open")
@@ -228,3 +228,4 @@ internal class MusicPlayerView
             // TODO: Load playlist
         }
     }
+}
