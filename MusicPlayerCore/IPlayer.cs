@@ -12,3 +12,8 @@ public interface IPlayer
     void ChangeVolume(double volume);
     
 }
+
+public enum PlaybackState
+{
+    Playing, Paused, Stopped
+}

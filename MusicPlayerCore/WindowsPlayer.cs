@@ -10,18 +10,32 @@ namespace MusicPlayerCore;
 public class WindowsPlayer : IPlayer
 {
 
-    private readonly WaveOutEvent outputDevice;
+    private WaveOutEvent outputDevice;
     private AudioFileReader audioFile;
+
+    private PlaybackState playbackState = PlaybackState.Stopped;
 
     public WindowsPlayer()
     {
-        outputDevice = new WaveOutEvent();
-        outputDevice.PlaybackStopped += OnPlaybackStopped;
     }
 
 
     public void Start(string path)
     {
+        if (outputDevice != null)
+        {
+            if (audioFile is not null)
+            {
+                audioFile.Dispose();
+                audioFile = null;
+            }
+            outputDevice.Dispose();
+            playbackState = PlaybackState.Stopped;
+        }
+
+        outputDevice = new WaveOutEvent();
+        outputDevice.PlaybackStopped += OnPlaybackStopped;
+
         // if the file exits
         if (File.Exists(path))
         {
@@ -34,24 +48,15 @@ public class WindowsPlayer : IPlayer
                 outputDevice.Init(audioFile);
                 // play the audio file
                 outputDevice.Play();
+                // set the playback state to playing
+                playbackState = PlaybackState.Playing;
             }
         }
     }
 
     public string Status()
     {
-        if (outputDevice.PlaybackState == PlaybackState.Playing)
-        {
-            return "Playing";
-        }
-        else if (outputDevice.PlaybackState == PlaybackState.Paused)
-        {
-            return "Paused";
-        }
-        else
-        {
-            return "Stopped";
-        }
+        return playbackState.ToString();
     }
 
     public void ChangeVolume(double volume)
@@ -66,35 +71,48 @@ public class WindowsPlayer : IPlayer
 
     public void PlayPause()
     {
-        
-        if (outputDevice.PlaybackState == PlaybackState.Playing)
+        if (playbackState == PlaybackState.Playing)
         {
+            // pause the audio file
             outputDevice.Pause();
+            // set the playback state to paused
+            playbackState = PlaybackState.Paused;
         }
-        else if (outputDevice.PlaybackState == PlaybackState.Paused)
+        // if the playback state is paused
+        else if (playbackState == PlaybackState.Paused)
         {
+            // play the audio file
             outputDevice.Play();
+            // set the playback state to playing
+            playbackState = PlaybackState.Playing;
         }
     }
 
     public void SeekForward()
     {
-        if (audioFile is not null && audioFile.CurrentTime <= audioFile.TotalTime)
+        if (playbackState != PlaybackState.Stopped && audioFile != null && audioFile.CurrentTime <= audioFile.TotalTime)
         {
             audioFile.CurrentTime += TimeSpan.FromSeconds(5);
         }
     }
     public void SeekBackward() 
     {
-        if (audioFile is not null && audioFile.CurrentTime >= TimeSpan.FromSeconds(5))
+        if  (playbackState != PlaybackState.Stopped && audioFile is not null)
         {
-            audioFile.CurrentTime -= TimeSpan.FromSeconds(5);
+            if (audioFile.CurrentTime <= TimeSpan.FromSeconds(5))
+            {
+                audioFile.CurrentTime = TimeSpan.Zero;
+            }
+            else
+            {
+                audioFile.CurrentTime -= TimeSpan.FromSeconds(5);
+            }
         }
     }
 
     public TimeSpan CurrentTime()
     {
-        if (audioFile is not null)
+        if (audioFile is not null && playbackState != PlaybackState.Stopped)
         {
             return audioFile.CurrentTime;
         }
@@ -105,7 +123,7 @@ public class WindowsPlayer : IPlayer
     }
     public TimeSpan TotalTime()
     {
-        if (audioFile is not null)
+        if (audioFile is not null && playbackState != PlaybackState.Stopped)
         {
             return audioFile.TotalTime;
         }
@@ -116,13 +134,20 @@ public class WindowsPlayer : IPlayer
     }
 
 
-    public void OnPlaybackStopped(object? sender, StoppedEventArgs args)
+    public void OnPlaybackStopped(object? sender, StoppedEventArgs? args)
     {
         if (audioFile is not null)
         {
             audioFile.Dispose();
+            audioFile = null;
+            Console.WriteLine("Audio file disposed");
         }
-
+        else
+        {
+            Console.WriteLine("Audio file is null");
+        }
+        Console.WriteLine("device disposed");
         outputDevice.Dispose();
+        playbackState = PlaybackState.Stopped;
     }
 }

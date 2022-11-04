@@ -12,8 +12,8 @@ internal class Program
         //musicPlayer.Init();
 
         IPlayer player = new WindowsPlayer();
-        string path = @"";
-        //string path = @"C:\Users\stolo\test.mp3";
+        //string path = @"";
+        string path = @"C:\Users\stolo\test.mp3";
         player.Start(path);
         while (true)
         {
@@ -34,7 +34,7 @@ internal class Program
                     player.ChangeVolume(double.Parse(Console.ReadLine()));
                     break;
                 case ConsoleKey.S:
-                    player.Status();
+                    Console.WriteLine(player.Status());
                     break;
                 case ConsoleKey.C:
                     Console.WriteLine(player.CurrentTime());
@@ -44,6 +44,9 @@ internal class Program
                     break;
                 case ConsoleKey.Q:
                     return;
+                case ConsoleKey.R:
+                    player.Start(path);
+                    break;
                 default:
                     break;
             }
