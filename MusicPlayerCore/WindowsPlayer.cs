@@ -38,28 +38,82 @@ public class WindowsPlayer : IPlayer
         }
     }
 
-    public void Status() => throw new NotImplementedException();
+    public string Status()
+    {
+        if (outputDevice.PlaybackState == PlaybackState.Playing)
+        {
+            return "Playing";
+        }
+        else if (outputDevice.PlaybackState == PlaybackState.Paused)
+        {
+            return "Paused";
+        }
+        else
+        {
+            return "Stopped";
+        }
+    }
 
-    public void ChangeVolume(double volume) => throw new NotImplementedException();
+    public void ChangeVolume(double volume)
+    {
+        // if the audio file is not null
+        if (audioFile != null)
+        {
+            // set the volume of the audio file
+            audioFile.Volume = (float)volume;
+        }
+    }
 
     public void PlayPause()
     {
+        
         if (outputDevice.PlaybackState == PlaybackState.Playing)
         {
             outputDevice.Pause();
         }
-        else
+        else if (outputDevice.PlaybackState == PlaybackState.Paused)
         {
             outputDevice.Play();
         }
-
     }
 
-    public void SeekBackward() => throw new NotImplementedException();
-    public void SeekForward() => throw new NotImplementedException();
+    public void SeekForward()
+    {
+        if (audioFile is not null && audioFile.CurrentTime <= audioFile.TotalTime)
+        {
+            audioFile.CurrentTime += TimeSpan.FromSeconds(5);
+        }
+    }
+    public void SeekBackward() 
+    {
+        if (audioFile is not null && audioFile.CurrentTime >= TimeSpan.FromSeconds(5))
+        {
+            audioFile.CurrentTime -= TimeSpan.FromSeconds(5);
+        }
+    }
 
-    public TimeSpan CurrentTime() => throw new NotImplementedException();
-    public TimeSpan TotalTime() => throw new NotImplementedException();
+    public TimeSpan CurrentTime()
+    {
+        if (audioFile is not null)
+        {
+            return audioFile.CurrentTime;
+        }
+        else
+        {
+            return TimeSpan.Zero;
+        }
+    }
+    public TimeSpan TotalTime()
+    {
+        if (audioFile is not null)
+        {
+            return audioFile.TotalTime;
+        }
+        else
+        {
+            return TimeSpan.Zero;
+        }
+    }
 
 
     public void OnPlaybackStopped(object? sender, StoppedEventArgs args)

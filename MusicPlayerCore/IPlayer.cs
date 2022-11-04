@@ -6,7 +6,7 @@ public interface IPlayer
     void PlayPause();
     void SeekForward();
     void SeekBackward();
-    void Status();
+    string Status();
     System.TimeSpan CurrentTime();
     System.TimeSpan TotalTime();
     void ChangeVolume(double volume);

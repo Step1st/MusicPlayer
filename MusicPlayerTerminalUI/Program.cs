@@ -18,8 +18,35 @@ internal class Program
         while (true)
         {
             Console.WriteLine("Press any key to play/pause");
-            Console.ReadKey();
-            player.PlayPause();
+            switch (Console.ReadKey().Key)
+            {
+                case ConsoleKey.P:
+                    player.PlayPause();
+                    break;
+                case ConsoleKey.F:
+                    player.SeekForward();
+                    break;
+                case ConsoleKey.B:
+                    player.SeekBackward();
+                    break;
+                case ConsoleKey.V:
+                    Console.WriteLine("Enter volume");
+                    player.ChangeVolume(double.Parse(Console.ReadLine()));
+                    break;
+                case ConsoleKey.S:
+                    player.Status();
+                    break;
+                case ConsoleKey.C:
+                    Console.WriteLine(player.CurrentTime());
+                    break;
+                case ConsoleKey.T:
+                    Console.WriteLine(player.TotalTime());
+                    break;
+                case ConsoleKey.Q:
+                    return;
+                default:
+                    break;
+            }
         }
     }
 }
@@ -34,6 +61,6 @@ public class MockPlayer : IPlayer
     public void SeekBackward() => throw new NotImplementedException();
     public void SeekForward() => throw new NotImplementedException();
     public void Start(string path) => throw new NotImplementedException();
-    public void Status() => throw new NotImplementedException();
+    public string Status() => throw new NotImplementedException();
     public TimeSpan TotalTime() => throw new NotImplementedException();
 }
