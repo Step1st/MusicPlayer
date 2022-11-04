@@ -2,11 +2,10 @@
 
 public interface IPlayer
 {
+    void Start(string path);
     void PlayPause();
     void SeekForward();
     void SeekBackward();
-    void Next();
-    void Previous();
     void Status();
     System.TimeSpan CurrentTime();
     System.TimeSpan TotalTime();
