@@ -157,6 +157,8 @@ internal class MusicPlayerView
 
         playing.Add(label);
 
+        //var color = new
+
         progressBar = new ProgressBar()
         {
             X = 0,
@@ -164,7 +166,7 @@ internal class MusicPlayerView
             Width = Dim.Fill() - 17,
             Height = 1,
             ProgressBarStyle = ProgressBarStyle.MarqueeContinuous,
-            ColorScheme = Colors.Menu,
+            ColorScheme = Colors.ColorSchemes["Base"],
             ProgressBarFormat = ProgressBarFormat.Framed
         };
 
@@ -302,7 +304,7 @@ internal class MusicPlayerView
         {
             while (player.CurrentTime().Seconds < player.TotalTime().TotalSeconds && player.PlaybackState is not PlaybackState.Stopped)
             {
-                progressBar.Fraction = (float)(player.CurrentTime().Seconds / player.TotalTime().TotalSeconds);
+                progressBar.Fraction = (float)(player.CurrentTime().TotalSeconds / player.TotalTime().TotalSeconds);
                 var timePlayed = player.CurrentTime().ToString(@"mm\:ss");
                 var trackLength = player.TotalTime().ToString(@"mm\:ss");
                 UpdateTime($"{timePlayed} / {trackLength}");

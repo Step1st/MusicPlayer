@@ -11,7 +11,6 @@ public interface IPlayer
     string Status();
     System.TimeSpan CurrentTime();
     System.TimeSpan TotalTime();
-    void ChangeVolume(double volume);
     void VolumeUp();
     void VolumeDown();
 

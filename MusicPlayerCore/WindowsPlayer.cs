@@ -54,16 +54,6 @@ public class WindowsPlayer : IPlayer
         return PlaybackState.ToString();
     }
 
-    public void ChangeVolume(double volume)
-    {
-        // if the audio file is not null
-        if (audioFile != null)
-        {
-            // set the volume of the audio file
-            audioFile.Volume = (float)volume;
-        }
-    }
-
     public void PlayPause()
     {
         if (PlaybackState == PlaybackState.Playing)
@@ -145,7 +135,7 @@ public class WindowsPlayer : IPlayer
         {
             if (audioFile.Volume < 1)
             {
-                audioFile.Volume += 0.1f;
+                audioFile.Volume += 0.05f;
             }
         }
     }
@@ -156,7 +146,7 @@ public class WindowsPlayer : IPlayer
         {
             if (audioFile.Volume > 0)
             {
-                audioFile.Volume -= 0.1f;
+                audioFile.Volume -= 0.05f;
             }
         }
     }
