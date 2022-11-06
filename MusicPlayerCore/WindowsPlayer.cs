@@ -10,10 +10,10 @@ namespace MusicPlayerCore;
 public class WindowsPlayer : IPlayer
 {
 
-    private WaveOutEvent outputDevice;
+    private readonly WaveOutEvent outputDevice;
     private AudioFileReader audioFile;
 
-    private PlaybackState playbackState = PlaybackState.Stopped;
+    public PlaybackState PlaybackState { get; private set; } = PlaybackState.Stopped;
 
     public WindowsPlayer()
     {
@@ -44,55 +44,45 @@ public class WindowsPlayer : IPlayer
             // play the audio file
             outputDevice.Play();
             // set the playback state to playing
-            playbackState = PlaybackState.Playing;
+            PlaybackState = PlaybackState.Playing;
         }
         
     }
 
     public string Status()
     {
-        return playbackState.ToString();
-    }
-
-    public void ChangeVolume(double volume)
-    {
-        // if the audio file is not null
-        if (audioFile != null)
-        {
-            // set the volume of the audio file
-            audioFile.Volume = (float)volume;
-        }
+        return PlaybackState.ToString();
     }
 
     public void PlayPause()
     {
-        if (playbackState == PlaybackState.Playing)
+        if (PlaybackState == PlaybackState.Playing)
         {
             // pause the audio file
             outputDevice.Pause();
             // set the playback state to paused
-            playbackState = PlaybackState.Paused;
+            PlaybackState = PlaybackState.Paused;
         }
         // if the playback state is paused
-        else if (playbackState == PlaybackState.Paused)
+        else if (PlaybackState == PlaybackState.Paused)
         {
             // play the audio file
             outputDevice.Play();
             // set the playback state to playing
-            playbackState = PlaybackState.Playing;
+            PlaybackState = PlaybackState.Playing;
         }
     }
 
     public void SeekForward()
     {
-        if (playbackState != PlaybackState.Stopped && audioFile != null && audioFile.CurrentTime <= audioFile.TotalTime)
+        if (PlaybackState != PlaybackState.Stopped && audioFile != null && audioFile.CurrentTime <= audioFile.TotalTime)
         {
             audioFile.CurrentTime += TimeSpan.FromSeconds(5);
         }
     }
     public void SeekBackward() 
     {
-        if  (playbackState != PlaybackState.Stopped && audioFile != null)
+        if  (PlaybackState != PlaybackState.Stopped && audioFile != null)
         {
             if (audioFile.CurrentTime <= TimeSpan.FromSeconds(5))
             {
@@ -107,7 +97,7 @@ public class WindowsPlayer : IPlayer
 
     public TimeSpan CurrentTime()
     {
-        if (audioFile is not null && playbackState != PlaybackState.Stopped)
+        if (audioFile is not null && PlaybackState != PlaybackState.Stopped)
         {
             return audioFile.CurrentTime;
         }
@@ -118,7 +108,7 @@ public class WindowsPlayer : IPlayer
     }
     public TimeSpan TotalTime()
     {
-        if (audioFile is not null && playbackState != PlaybackState.Stopped)
+        if (audioFile is not null && PlaybackState != PlaybackState.Stopped)
         {
             return audioFile.TotalTime;
         }
@@ -136,6 +126,28 @@ public class WindowsPlayer : IPlayer
             audioFile.Dispose();
         }
         outputDevice.Dispose();
-        playbackState = PlaybackState.Stopped;
+        PlaybackState = PlaybackState.Stopped;
+    }
+
+    public void VolumeUp()
+    {
+        if (audioFile is not null)
+        {
+            if (audioFile.Volume < 1)
+            {
+                audioFile.Volume += 0.05f;
+            }
+        }
+    }
+
+    public void VolumeDown()
+    {
+        if (audioFile is not null)
+        {
+            if (audioFile.Volume > 0)
+            {
+                audioFile.Volume -= 0.05f;
+            }
+        }
     }
 }
