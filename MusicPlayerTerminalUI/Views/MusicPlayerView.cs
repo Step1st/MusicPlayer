@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using Terminal.Gui;
-using MusicPlayerCore;
+using MusicPlayerCore.Player;
 
 namespace MusicPlayer.Views;
 
@@ -240,6 +240,9 @@ internal class MusicPlayerView
             //var filename = System.IO.Path.GetFileName(file.ToString());
             tracks.Add(file.ToString()!);
             player.Start(file.ToString()!);
+            UpdateTrackName(file.ToString()!);
+            progressBar.Fraction = 0f;
+            UpdateProgressBar();
             Application.Refresh();
         }
     }

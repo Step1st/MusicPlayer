@@ -1,4 +1,4 @@
-﻿namespace MusicPlayerCore;
+﻿namespace MusicPlayerCore.Player;
 
 public interface IPlayer
 {

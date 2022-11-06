@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 using NAudio.Wave;
 
-namespace MusicPlayerCore;
+namespace MusicPlayerCore.Player;
 public class WindowsPlayer : IPlayer
 {
 

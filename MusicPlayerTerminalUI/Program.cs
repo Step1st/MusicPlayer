@@ -1,5 +1,5 @@
 using MusicPlayer.Views;
-using MusicPlayerCore;
+using MusicPlayerCore.Player;
 using System.Runtime.InteropServices;
 using System.Numerics;
 
