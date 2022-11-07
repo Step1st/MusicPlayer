@@ -305,7 +305,7 @@ internal class MusicPlayerView
     {
         mainLoopTimeout = Application.MainLoop.AddTimeout(TimeSpan.FromSeconds(1), (updateTimer) =>
         {
-            while (player.CurrentTime().Seconds < player.TotalTime().TotalSeconds && player.PlaybackState is not PlaybackState.Stopped)
+            while (player.CurrentTime().TotalSeconds <= player.TotalTime().TotalSeconds && player.PlaybackState is not PlaybackState.Stopped)
             {
                 progressBar.Fraction = (float)(player.CurrentTime().TotalSeconds / player.TotalTime().TotalSeconds);
                 var timePlayed = player.CurrentTime().ToString(@"mm\:ss");
