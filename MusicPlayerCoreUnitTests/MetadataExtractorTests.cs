@@ -7,43 +7,50 @@ using System.Threading.Tasks;
 namespace MusicPlayerCoreUnitTests;
 public class MetadataExtractorTests
 {
-    [Fact]
-    public void GetTitle()
+
+    public string path = @"../../../../Songs/testMetadata.mp3";
+    [Theory]
+    [InlineData("../../../../Songs/testMetadata.mp3", "TestTitle")]
+    [InlineData("../../../../Songs/testNoMetadata.mp3", "testNoMetadata.mp3")]
+    public void GetTitle(string path, string expectedTitle)
     {
-        var path = @"C:\Users\stolo\Music\testMetadata.mp3";
-        var title = MetadataExtractor.GetTitle(path);
-        Assert.Equal("TestTitle", title);
+        var actualTitle = MetadataExtractor.GetTitle(path);
+        Assert.Equal(expectedTitle, actualTitle);
     }
 
-    [Fact]
-    public void GetArtist()
+    [Theory]
+    [InlineData("../../../../Songs/testMetadata.mp3", "TestArtist")]
+    [InlineData("../../../../Songs/testNoMetadata.mp3", "-")]
+    public void GetArtist(string path, string expectedArtist)
     {
-        var path = @"C:\Users\stolo\Music\testMetadata.mp3";
-        var artist = MetadataExtractor.GetArtist(path);
-        Assert.Equal("TestArtist", artist);
+        var actualArtist = MetadataExtractor.GetArtist(path);
+        Assert.Equal(expectedArtist, actualArtist);
     }
 
-    [Fact]
-    public void GetAlbum()
+    [Theory]
+    [InlineData("../../../../Songs/testMetadata.mp3", "TestAlbum")]
+    [InlineData("../../../../Songs/testNoMetadata.mp3", "-")]
+    public void GetAlbum(string path, string expectedAlbum)
     {
-        var path = @"C:\Users\stolo\Music\testMetadata.mp3";
-        var album = MetadataExtractor.GetAlbum(path);
-        Assert.Equal("TestAlbum", album);
+        var actualAlbum = MetadataExtractor.GetAlbum(path);
+        Assert.Equal(expectedAlbum, actualAlbum);
     }
 
-    [Fact]
-    public void GetGenre()
+    [Theory]
+    [InlineData("../../../../Songs/testMetadata.mp3", "TestGenre")]
+    [InlineData("../../../../Songs/testNoMetadata.mp3", "-")]
+    public void GetGenre(string path, string expectedGenre)
     {
-        var path = @"C:\Users\stolo\Music\testMetadata.mp3";
-        var genre = MetadataExtractor.GetGenre(path);
-        Assert.Equal("TestGenre", genre);
+        var actualGenre = MetadataExtractor.GetGenre(path);
+        Assert.Equal(expectedGenre, actualGenre);
     }
 
-    [Fact]
-    public void GetYear()
+    [Theory]
+    [InlineData("../../../../Songs/testMetadata.mp3", "2022")]
+    [InlineData("../../../../Songs/testNoMetadata.mp3", "-")]
+    public void GetYear(string path, string expectedYear)
     {
-        var path = @"C:\Users\stolo\Music\testMetadata.mp3";
-        var year = MetadataExtractor.GetYear(path);
-        Assert.Equal("2022", year);
+        var actualYear = MetadataExtractor.GetYear(path);
+        Assert.Equal(expectedYear, actualYear);
     }
 }
