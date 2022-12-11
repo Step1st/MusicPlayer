@@ -4,6 +4,7 @@ public interface IPlayer
 {
 
     PlaybackState PlaybackState { get; }
+    int Volume { get; }
     void Start(string path);
     void PlayPause();
     void SeekForward();

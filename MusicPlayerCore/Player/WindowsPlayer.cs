@@ -15,6 +15,10 @@ public class WindowsPlayer : IPlayer
 
     public PlaybackState PlaybackState { get; private set; } = PlaybackState.Stopped;
 
+    private int volume = 100;
+
+    public int Volume => volume;
+
     public WindowsPlayer()
     {
         outputDevice = new WaveOutEvent();
@@ -39,6 +43,8 @@ public class WindowsPlayer : IPlayer
         {
             // create a new audio file reader
             audioFile = new AudioFileReader(path);
+            //set the volume
+            audioFile.Volume = volume / 100f;
             // set the output device to the audio file
             outputDevice.Init(audioFile);
             // play the audio file
@@ -131,23 +137,26 @@ public class WindowsPlayer : IPlayer
 
     public void VolumeUp()
     {
-        if (audioFile is not null)
+        if (volume < 100)
         {
-            if (audioFile.Volume < 1)
+            volume += 5;
+            if (audioFile is not null)
             {
-                audioFile.Volume += 0.05f;
+                audioFile.Volume = volume / 100f;
             }
         }
     }
 
     public void VolumeDown()
     {
-        if (audioFile is not null)
+        if (volume > 0)
         {
-            if (audioFile.Volume > 0)
+            volume -= 5;
+            if (audioFile is not null)
             {
-                audioFile.Volume -= 0.05f;
+                audioFile.Volume = volume / 100f;
             }
         }
+
     }
 }

@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using Terminal.Gui;
 using MusicPlayerCore.Player;
 using MusicPlayerCore.Metadata;
+using MusicPlayerCore.Playlist;
 
 namespace MusicPlayer.Views;
 
@@ -17,6 +13,7 @@ internal class MusicPlayerView
     private Window Main;
     private FrameView trackList;
     private FrameView playback;
+    private Label nowPlaying;
     private ProgressBar progressBar;
 
     private List<string> tracks = new();
@@ -28,6 +25,8 @@ internal class MusicPlayerView
     private Label album;
     private Label genre;
     private Button playPause;
+    private Label volume;
+    private Label time;
 
     public MusicPlayerView(IPlayer player) => this.player = player;
 
@@ -50,7 +49,7 @@ internal class MusicPlayerView
             X = 0,
             Y = 0,
             Width = Dim.Percent(85f),
-            Height = Dim.Percent(70f)
+            Height = Dim.Percent(65f)
         };
 
         var list = new ListView(tracks)
@@ -78,7 +77,7 @@ internal class MusicPlayerView
             X = Pos.Percent(85f),
             Y = 0,
             Width = Dim.Fill(),
-            Height = Dim.Percent(18f)
+            Height = Dim.Percent(16.25f)
         };
         
         track = new Label("-")
@@ -94,9 +93,9 @@ internal class MusicPlayerView
         var artistView = new FrameView("Artist")
         {
             X = Pos.Percent(85f),
-            Y = Pos.Percent(18f),
+            Y = Pos.Percent(16.25f),
             Width = Dim.Fill(),
-            Height = Dim.Percent(18f)
+            Height = Dim.Percent(16.25f)
         };
 
         artist = new Label("-")
@@ -112,9 +111,9 @@ internal class MusicPlayerView
         var albumView = new FrameView("Album")
         {
             X = Pos.Percent(85f),
-            Y = Pos.Percent(36f),
+            Y = Pos.Percent(33f),
             Width = Dim.Fill(),
-            Height = Dim.Percent(18f)
+            Height = Dim.Percent(16.25f)
         };
 
         album = new Label("-")
@@ -153,15 +152,25 @@ internal class MusicPlayerView
         playback = new FrameView("Playback")
         {
             X = 0,
-            Y = Pos.Percent(70f),
+            Y = Pos.Percent(65f),
             Width = Dim.Fill(),
-            Height = Dim.Percent(32f)
+            Height = Dim.Percent(38f)
         };
+
+        nowPlaying = new Label("Now Playing: ")
+        {
+            X = 0,
+            Y = Pos.Percent(20f),
+            Width = Dim.Percent(50f),
+            Height = 1
+        };
+
+        playback.Add(nowPlaying);
 
         progressBar = new ProgressBar()
         {
             X = 0,
-            Y = Pos.Percent(75f),
+            Y = Pos.Percent(80f),
             Width = Dim.Fill() - 17,
             Height = 1,
             ProgressBarStyle = ProgressBarStyle.Continuous,
@@ -171,20 +180,20 @@ internal class MusicPlayerView
 
         playback.Add(progressBar);
 
-        var timelabel = new Label("00:00 / 00:00")
+        time = new Label("00:00 / 00:00")
         {
             X = Pos.Right(progressBar) + 1,
-            Y = Pos.Percent(75f),
+            Y = Pos.Percent(80f),
             Width = Dim.Percent(50f),
             Height = 1
         };
 
-        playback.Add(timelabel);
+        playback.Add(time);
 
         var seekF = new Button("<< Seek")
         {
             X = 0,
-            Y = Pos.Percent(30f),
+            Y = Pos.Percent(50f),
             Width = 10,
             Height = 1
         };
@@ -195,7 +204,7 @@ internal class MusicPlayerView
         playPause = new Button("Play")
         {
             X = Pos.Right(seekF) + Pos.Percent(2f),
-            Y = Pos.Percent(30f),
+            Y = Pos.Percent(50f),
             Width = 10,
             Height = 1
         };
@@ -211,7 +220,7 @@ internal class MusicPlayerView
         var seekB = new Button(">> Seek")
         {
             X = Pos.Right(playPause) + Pos.Percent(2f),
-            Y = Pos.Percent(30f),
+            Y = Pos.Percent(50f),
             Width = 10,
             Height = 1
         };
@@ -224,37 +233,49 @@ internal class MusicPlayerView
         var volumeUp = new Button("+ Volume")
         {
             X = Pos.Right(seekB) + Pos.Percent(4f),
-            Y = Pos.Percent(30f),
+            Y = Pos.Percent(50f),
             Width = 10,
             Height = 1
         };
 
-        volumeUp.Clicked += player.VolumeUp;
+        volumeUp.Clicked += VolumeUp;
         playback.Add(volumeUp);
 
 
         var volumeDown = new Button("- Volume")
         {
             X = Pos.Right(volumeUp) + Pos.Percent(2f),
-            Y = Pos.Percent(30f),
+            Y = Pos.Percent(50f),
             Width = 10,
             Height = 1
         };
 
-        volumeDown.Clicked += player.VolumeDown;
+        volumeDown.Clicked += VolumeDown;
 
         playback.Add(volumeDown);
 
 
-        var volume = new Label("Volume: ")
+        volume = new Label($"Volume: {player.Volume}")
         {
             X = Pos.Right(volumeDown) + Pos.Percent(3f),
-            Y = Pos.Percent(30f),
+            Y = Pos.Percent(50f),
             Width = 10,
             Height = 1
         };
 
         playback.Add(volume);
+    }
+
+    private void VolumeDown()
+    {
+        player.VolumeDown();
+        UpdateVolume();
+    }
+
+    private void VolumeUp()
+    {
+        player.VolumeUp();
+        UpdateVolume();
     }
 
     public void Init()
@@ -278,20 +299,56 @@ internal class MusicPlayerView
 
                 new MenuItem("Open _folder", "Open a folder of music files", () => OpenFolder()),
 
-                new MenuItem("Open Pla_ylist", "Load a playlist", () => throw new NotImplementedException()),
+                new MenuItem("Open Pla_ylist", "Load a playlist", () => OpenPlaylist()),
+                
+                new MenuItem("_Create Playlist", "Create a m3u playlist", () => CreatePlaylist()),
 
                 new MenuItem("_Quit", "Exit Music Player", () => Application.RequestStop()),
-            }),
-
-            new MenuBarItem("_Help", new MenuItem[]
-            {
-                new MenuItem("_About", "", () => Console.Write("")),
             })
         });
 
         top.Add(Main, menu);
 
         Application.Run();
+    }
+
+    private void CreatePlaylist()
+    {
+        var dialog = new SaveDialog("Create Playlist", "Create a playlist")
+        {
+            AllowedFileTypes = new string[] { "m3u" },
+            DirectoryPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+        };
+        Application.Run(dialog);
+
+        if (!dialog.Canceled)
+        {
+            var playlistPath = dialog.FilePath.ToString()!;
+            M3UPlaylistManager.CreatePlaylist(playlistPath, tracks);
+        }
+    }
+
+    private void OpenPlaylist()
+    {
+        var dialog = new OpenDialog("Open Playlist", "Select playlist to open")
+        {
+            AllowsMultipleSelection = false,
+            CanChooseDirectories = false,
+            CanChooseFiles = true,
+            AllowedFileTypes = new[] { ".m3u" },
+            DirectoryPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+        };
+        Application.Run(dialog);
+        
+        if (!dialog.Canceled)
+        {
+            var playlist = dialog.FilePath.ToString()!;
+            tracks.Clear();
+            tracks.AddRange(M3UPlaylistManager.LoadPlaylist(playlist));
+            Debug.WriteLine(tracks.Count);
+            //PlayTrack(tracks.FirstOrDefault()!);
+            Application.Refresh();
+        }
     }
 
     public void OpenFile()
@@ -322,7 +379,7 @@ internal class MusicPlayerView
             Application.Refresh();
         }
     }
-
+    
     private void PlayTrack(string firstFile)
     {
         player.Start(firstFile.ToString()!);
@@ -332,6 +389,7 @@ internal class MusicPlayerView
     private void UpdateUI(string file)
     {
         UpdateMetadataName(file);
+        UpdateNowPlaying(file);
         progressBar.Fraction = 0f;
         UpdateProgressBar();
         UpdatePlayPauseButton();
@@ -371,18 +429,20 @@ internal class MusicPlayerView
         genre.Text = MetadataExtractor.GetGenre(path);
     }
 
-    private void UpdateTime(string time)
-    {
-        var timelabel = new Label(time)
-        {
-            X = Pos.Right(progressBar) + 1,
-            Y = Pos.Percent(75f),
-            Width = Dim.Percent(50f),
-            Height = 1
-        };
+    private void UpdateNowPlaying(string track) => nowPlaying.Text = $"Now Playing: {track}";
 
-        playback.Add(timelabel);
-    }
+    //private void UpdateTime(string time)
+    //{
+    //    var timelabel = new Label(time)
+    //    {
+    //        X = Pos.Right(progressBar) + 1,
+    //        Y = Pos.Percent(75f),
+    //        Width = Dim.Percent(50f),
+    //        Height = 1
+    //    };
+
+    //    playback.Add(timelabel);
+    //}
 
     private void UpdatePlayPauseButton()
     {
@@ -405,7 +465,7 @@ internal class MusicPlayerView
                 progressBar.Fraction = (float)(player.CurrentTime().TotalSeconds / player.TotalTime().TotalSeconds);
                 var timePlayed = player.CurrentTime().ToString(@"mm\:ss");
                 var trackLength = player.TotalTime().ToString(@"mm\:ss");
-                UpdateTime($"{timePlayed} / {trackLength}");
+                time.Text = $"{timePlayed} / {trackLength}";
 
                 return true;
             }
@@ -413,4 +473,6 @@ internal class MusicPlayerView
             return false;
         });
     }
+
+    private void UpdateVolume() => volume.Text = $"Volume: {player.Volume}";
 }
