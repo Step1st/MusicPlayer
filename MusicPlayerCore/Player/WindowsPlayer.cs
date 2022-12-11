@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,8 +10,7 @@ using NAudio.Wave;
 namespace MusicPlayerCore.Player;
 public class WindowsPlayer : IPlayer
 {
-
-    private readonly WaveOutEvent outputDevice;
+    private WaveOutEvent outputDevice;
     private AudioFileReader audioFile;
 
     public PlaybackState PlaybackState { get; private set; } = PlaybackState.Stopped;
@@ -19,23 +19,20 @@ public class WindowsPlayer : IPlayer
 
     public int Volume => volume;
 
+    public event EventHandler FinishedPlaying;
+
     public WindowsPlayer()
     {
         outputDevice = new WaveOutEvent();
         outputDevice.PlaybackStopped += OnPlaybackStopped;
     }
 
-    public void Restart()
-    {
-        outputDevice.Stop();
-        Console.WriteLine("Restarting");
-    }
-
     public void Start(string path)
     {
         if (outputDevice != null)
         {
-            outputDevice.Dispose();
+            outputDevice.Stop();
+            Thread.Sleep(120);
         }
 
         // if the file exits
@@ -53,11 +50,6 @@ public class WindowsPlayer : IPlayer
             PlaybackState = PlaybackState.Playing;
         }
         
-    }
-
-    public string Status()
-    {
-        return PlaybackState.ToString();
     }
 
     public void PlayPause()
@@ -127,12 +119,15 @@ public class WindowsPlayer : IPlayer
 
     public void OnPlaybackStopped(object? sender, StoppedEventArgs args)
     {
+        Debug.WriteLine("Happend");
         if (audioFile is not null)
         {
             audioFile.Dispose();
         }
         outputDevice.Dispose();
         PlaybackState = PlaybackState.Stopped;
+
+        FinishedPlaying?.Invoke(this, EventArgs.Empty);
     }
 
     public void VolumeUp()
