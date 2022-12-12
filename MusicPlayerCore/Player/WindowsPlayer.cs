@@ -10,7 +10,7 @@ using NAudio.Wave;
 namespace MusicPlayerCore.Player;
 public class WindowsPlayer : IPlayer
 {
-    private WaveOutEvent outputDevice;
+    private readonly WaveOutEvent outputDevice;
     private AudioFileReader audioFile;
 
     public PlaybackState PlaybackState { get; private set; } = PlaybackState.Stopped;
@@ -18,8 +18,6 @@ public class WindowsPlayer : IPlayer
     private int volume = 100;
 
     public int Volume => volume;
-
-    public event EventHandler FinishedPlaying;
 
     public WindowsPlayer()
     {
@@ -119,15 +117,13 @@ public class WindowsPlayer : IPlayer
 
     public void OnPlaybackStopped(object? sender, StoppedEventArgs args)
     {
-        Debug.WriteLine("Happend");
         if (audioFile is not null)
         {
             audioFile.Dispose();
         }
         outputDevice.Dispose();
+        
         PlaybackState = PlaybackState.Stopped;
-
-        FinishedPlaying?.Invoke(this, EventArgs.Empty);
     }
 
     public void VolumeUp()
